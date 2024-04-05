@@ -29,40 +29,9 @@ CREATE TABLE Sales
     saleDate NVARCHAR(100) NOT NULL,
     FOREIGN KEY (itemID) REFERENCES Items(itemID)
 );
-
--- Procedure to update item details
-IF OBJECT_ID('EditItem') IS NOT NULL
-    DROP PROCEDURE EditItem;
-GO
-
-CREATE PROCEDURE EditItem
-    @itemID INT,
-    @newPrice INT,
-    @newQuantity INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    -- Check if the item exists
-    IF NOT EXISTS (SELECT 1
-    FROM Items
-    WHERE itemID = @itemID)
-    BEGIN
-        RAISERROR('Item not found', 16, 1);
-        RETURN;
-    END
-
-    -- Update item price and quantity
-    UPDATE Items
-    SET itemPrice = @newPrice,
-        itemQTY = @newQuantity
-    WHERE itemID = @itemID;
-END;
-GO
-
--- Procedure to update stock quantity
+-- PROCEDURE TO UPDATE THE ITEMS TABLE FOR WHEN AN ITEM'S STOCK IS CHANGED
 IF OBJECT_ID('UpdateStockQuantity') IS NOT NULL
-    DROP PROCEDURE UpdateStockQuantity;
+DROP PROCEDURE UpdateStockQuantity;
 GO
 
 CREATE PROCEDURE UpdateStockQuantity
@@ -77,17 +46,22 @@ BEGIN
     FROM Items
     WHERE itemID = @itemID)
     BEGIN
-        RAISERROR('Item not found', 16, 1);
+        RAISERROR
+    ('Item not found', 16, 1);
         RETURN;
     END
 
-    -- Update item quantity
+    -- Update the stock quantity
     UPDATE Items
     SET itemQTY = @newQuantity
     WHERE itemID = @itemID;
+
+    -- Optionally, you can return information about the updated stock
+    SELECT itemID, itemQTY
+    FROM Items
+    WHERE itemID = @itemID;
 END;
 GO
-
 -- Procedure to record a sale
 IF OBJECT_ID('RecordSale') IS NOT NULL
     DROP PROCEDURE RecordSale;
@@ -110,3 +84,16 @@ BEGIN
         (@itemID, @itemName, @salePrice, @qtySold, @saleDate);
 END;
 GO
+
+INSERT INTO Items
+VALUES
+    ( 'Duck', 20.00, 100, 'duck'),
+    ( 'Flower', 15.00, 20, 'flower'),
+    -- ('Free Flower', 0, 20, 'flower'),
+    ( 'Small bag', 15.00, 10, 'smallBag'),
+    ( 'Duck blind bag', 1.00, 10, 'duckBag'),
+    ( 'Miffy keychain', 15.00, 15, 'miffyKeychain'),
+    ( 'Miffy plush', 35.00, 15, 'miffyPlush');
+
+SELECT *
+FROM Items;

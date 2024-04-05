@@ -41,26 +41,6 @@ app.get("/items", (req, res) => {
 
 app.put("/items/:itemID", (req, res) => {
   const { itemID } = req.params;
-  const { newPrice } = req.body;
-  const { newQuantity } = req.body;
-
-  const request = new sql.Request();
-  request.input("itemID", sql.Int, itemID);
-  request.input("newPrice", sql.Int, newPrice);
-  request.input("newQuantity", sql.Int, newQuantity);
-
-  request.execute("EditItem", (err, result) => {
-    if (err) {
-      console.error("Error executing stored procedure:", err);
-      res.status(500).send("Error changing item.");
-      return;
-    }
-    res.status(200).send("Item changed successfully.");
-  });
-});
-
-app.put("/items/:itemID", (req, res) => {
-  const { itemID } = req.params;
   const { newQuantity } = req.body;
 
   const request = new sql.Request();
